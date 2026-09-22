@@ -1,9 +1,10 @@
-import products from "./data/Products";
+import  products  from "./data/products";
 import ProductCard from "./components/ProductCard";
 import { CartProvider } from "./context/CartContext";
 import "./App.css";
 import Navbar from "./components/Navbar";
 import Cart from "./components/Cart";
+
 
 function App() {
   return (
