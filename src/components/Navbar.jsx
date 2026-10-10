@@ -1,15 +1,16 @@
 import { useContext } from "react";
 import { CartContext } from "../context/CartContext";
+import { Link } from "react-router-dom";
 
 function Navbar() {
   const { cart } = useContext(CartContext);
 
   return (
     <nav className="navbar">
-      <div className="navbar-logo">
+      <Link to="/" className="navbar-logo">
         <h1>My Store</h1>
-      </div>
-      <span className="navbar-cart">🛒 Cart ({cart.reduce((total,item)=>total+ item.quantity,0)})</span>
+      </Link>
+      <Link to="/Cart" className="navbar-cart">🛒 Cart ({cart.reduce((total,item)=>total+ item.quantity,0)})</Link>
     </nav>
   );
 }

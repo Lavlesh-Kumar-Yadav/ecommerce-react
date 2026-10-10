@@ -1,46 +1,93 @@
-import { createContext, useState } from "react";
+import { createContext, useReducer } from "react";
 
 const CartContext = createContext();
-
-function CartProvider({ children }) {
-  const [cart, setCart] = useState([]);
-
-  const addToCart = (product) => {
-    
-    const existingProduct=cart.find((item)=>item.id===product.id)
-    if(existingProduct){
-      setCart(
-        cart.map((item)=>item.id===product.id ? {...item, quantity: item.quantity +1} :item)
-      )
+function cartReducer(state, action) {
+  switch (action.type) {
+    case "ADD_TO_CART": {
+      const existingProduct = state.find(
+        (item) => item.id === action.product.id,
+      );
+      if (existingProduct) {
+        return state.map((item) =>
+          item.id === action.product.id
+            ? { ...item, quantity: item.quantity + 1 }
+            : item,
+        );
+      }
+      return [...state, { ...action.product, quantity: 1 }];
     }
-    else{
-      setCart([...cart,{...product, quantity:1}])
+
+    case "REMOVE_FROM_CART": {
+      return state.filter((item) => item.id !== action.productID);
     }
-  };
-
-  const removeFromCart=(productID) => {
-    setCart(cart.filter((item) => item.id !==productID))
-
+    case "INCREASE_QUANTITY": {
+      return state.map((item) =>
+        item.id === action.productID
+          ? { ...item, quantity: item.quantity + 1 }
+          : item,
+      );
+    }
+    case "DECREASE_QUANTITY": {
+      return state
+        .map((item) =>
+          item.id === action.productID
+            ? { ...item, quantity: item.quantity - 1 }
+            : item,
+        )
+        .filter((item) => item.quantity > 0);
+    }
+    case "CLEAR_CART":
+      return [];
+    default:
+      return state;
   }
-
-  const increaseQuantity=(productID)=>{
-setCart(
-  cart.map((item)=> item.id===productID ? {...item, quantity : item.quantity +1}:item)
-)
-  }
-  const decreaseQuantity= (productID)=>{
-    setCart(
-      cart.map((item)=>item.id ===productID ? {...item, quantity: item.quantity-1}:item )
-      .filter((item) => item.quantity > 0)
-    )
-          
-  }
-
-  return (
-    <CartContext.Provider value={{ cart, setCart, addToCart, removeFromCart,increaseQuantity,decreaseQuantity }}>
-      {children}
-    </CartContext.Provider>
-  );
 }
 
+function CartProvider({ children }) {
+  const [cart, dispatch] = useReducer(cartReducer, []);
+
+  const addToCart = (product) => {
+    dispatch({
+      type: "ADD_TO_CART",
+      product: product,
+    });
+  };
+
+
+const removeFromCart = (productID) => {
+  dispatch({
+    type: "REMOVE_FROM_CART",
+    productID: productID,
+  });
+};
+
+const increaseQuantity = (productID) => {
+  dispatch({
+    type: "INCREASE_QUANTITY",
+    productID: productID,
+  });
+};
+const decreaseQuantity = (productID) => {
+  dispatch({
+    type: "DECREASE_QUANTITY",
+    productID: productID,
+  });
+};
+
+
+return (
+  <CartContext.Provider
+    value={{
+      cart,
+      addToCart,
+      removeFromCart,
+      increaseQuantity,
+      decreaseQuantity,
+    }}
+  
+  >
+    {children}
+  </CartContext.Provider>
+);
+}
 export { CartProvider, CartContext };

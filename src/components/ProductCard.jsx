@@ -1,16 +1,14 @@
 import { useContext } from "react";
 import { CartContext } from "../context/CartContext";
+import { useNavigate } from "react-router-dom";
 
-function ProductCard({ product }) {
+function ProductCard({ product, onSelect }) {
   const { addToCart } = useContext(CartContext);
+  const navigate= useNavigate();
 
   return (
-    <div className="product-card">
-      <img
-        className="product-image"
-        src={product.image}
-        alt={product.name}
-      />
+    <div className="product-card" onClick={() => navigate(`/product/${product.id}`)}>
+      <img className="product-image" src={product.image} alt={product.name} />
 
       <h2>{product.name}</h2>
 
@@ -18,7 +16,10 @@ function ProductCard({ product }) {
 
       <button
         className="add-button"
-        onClick={() => addToCart(product)}
+        onClick={(e) => {
+          e.stopPropagation();
+          addToCart(product);
+        }}
       >
         Add to Cart
       </button>
